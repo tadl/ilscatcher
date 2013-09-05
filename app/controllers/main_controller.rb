@@ -187,22 +187,16 @@ else
 @avail = ""
 end
 
-if params[:facet].present?
-@facet = params[:facet]
-else
-@facet = ""
-end
-
 
   
 if params[:q].present? 
 
-@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=24'+ @sorttype +'&page='+ @nextpage +'&'+@facet 
+@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=' + @searchqueryclearned + '' +  @searchby + '&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=24'+ @sorttype +'&page='+ @nextpage 
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
 elsif params[:mt].present?
-@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=&qtype=keyword&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=24'+ @sorttype +'&page='+ @nextpage +'&facet='+ @facet
+@pagetitle = 'http://catalog.tadl.org/eg/opac/results?query=&qtype=keyword&fi%3A'+ @mediatype +''+ @avail +'&locg='+ @loc +'&limit=24'+ @sorttype +'&page='+ @nextpage 
 url = @pagetitle
 @doc = Nokogiri::HTML(open(url))  
 @pagenumber = @doc.at_css(".results-paginator-selected").text rescue nil
@@ -223,40 +217,6 @@ item:
 }
 end 
 
-
-
-
-@subjectlist = @doc.css(".facet_box_temp").map do |item|
-@facetcount = 0;
-group={}
-group['title'] = item.at_css('.header').text.strip.try(:squeeze, " ")
-group['facets'] = item.css("div.facet_template:not(.facet_template_selected)").map do |facet|
-child_facet = {}
-child_facet['facet'] = facet.at_css('.facet').text.strip.try(:squeeze, " ")
-child_facet['links'] = facet.css('a').map do |link|
-child_facet_link = {}
-child_facet_link['link'] = CGI::escape(link.attr('href').split(';', 5)[4])
-@facetcount = @facetcount + 1
-child_facet_link
-end
-child_facet
-end
-group['count'] = @facetcount;
-group
-end
-
-@selectedfacets = @doc.css("div.facet_template.facet_template_selected").map do |item|
-{
-facets:
-{
-:title => item.at_css('.facet').text.strip.try(:squeeze, " "),
-:link => CGI::escape(item.at_css('div.facet a').attr('href').split(';', 5)[4])
-}
-}
-end
-
-
-
 if @itemlist.count == 0
 
 respond_to do |format|
@@ -267,7 +227,7 @@ end
 else
 
 respond_to do |format|
-format.json { render :json => {:items => @itemlist, :subjects => @subjectlist, :selected => @selectedfacets }}
+format.json { render :json => Oj.dump(items: @itemlist )  }
 end
 
 end
