@@ -531,7 +531,7 @@ form = agent.page.forms[1]
 form.field_with(:name => "username").value = @username
 form.field_with(:name => "password").value = @password
 results = agent.submit(form)
-checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?loc=22")
+checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?loc=22&limit=100")
 @doc = checkoutpage.parser
 @pagetitle = @doc.css("title").text
 @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
@@ -566,7 +566,7 @@ form = agent.page.forms[1]
 form.field_with(:name => "username").value = @username
 form.field_with(:name => "password").value = @password
 results = agent.submit(form)
-checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?available=1")
+checkoutpage = agent.get("https://catalog.tadl.org/eg/opac/myopac/holds?available=1&limit=100")
 @doc = checkoutpage.parser
 @pagetitle = @doc.css("title").text
 @holds = @doc.css('tr#acct_holds_temp').map do |checkout|
